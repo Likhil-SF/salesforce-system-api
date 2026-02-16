@@ -70,6 +70,6 @@ jobs:
         run: |
           mvn -B deploy --settings .maven/settings.xml -DskipMunitTests -DmuleDeploy \
           -Danypoint.client.id="${{ secrets.ANYPOINT_CLIENT_ID }}" \
-          -Danypoint.client.secret="${{ secrets.ANYPOINT_CLIENT_SECRET }}"
+          -Danypoint.client.secret="${{ secrets.ANYPOINT_CLIENT_SECRET }}"\
           -Denv=dev
           -Dkey="${{}secrets.KEY}"
