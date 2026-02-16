@@ -5,11 +5,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>ab9b269f-eba0-4815-8ef3-e14af1ec32c1</groupId>
-	<artifactId>salesforce-system-api</artifactId>
+	<artifactId>salesforce-system-app</artifactId>
 	<version>1.0.0</version>
 	<packaging>mule-application</packaging>
 
-	<name>salesforce-system-api</name>
+	<name>salesforce-system-app</name>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -41,7 +41,7 @@
 						<target>Cloudhub-US-East-2</target>
 						<muleVersion>4.9.14</muleVersion>
 						<server>anypoint-exchange-v2</server>
-						<applicationName>testing</applicationName>
+						<applicationName>salesforce-system-app</applicationName>
 						<replicas>1</replicas>
 						<vCores>0.1</vCores>
 						<deploymentSettings>
@@ -58,7 +58,7 @@
 						<integrations>
 							<services>
 								<objectStoreV2>
-									<enabled>${deploy.anypoint.objectStoreV2}</enabled>
+									<enabled>true</enabled>
 								</objectStoreV2>
 							</services>
 						</integrations>
