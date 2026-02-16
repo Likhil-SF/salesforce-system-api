@@ -1,0 +1,309 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<sub-flow name="get-record-id-sub-flow"
+		doc:id="88db11fa-06da-431f-84c8-cf6aa48e0ef1">
+		<logger level="INFO" doc:name="Start Logger"
+			doc:id="d1d23d70-0b3b-4bf1-9f5e-d0ab7fd03be9"
+			message="#[output json&#10;---&#10;{&#10;	&quot;correlationId&quot;: vars.correlationId,&#10;	&quot;message&quot;: &quot;Get record Id flow started&quot;,&#10;	&quot;object&quot;: attributes.queryParams.'object',&#10;	&quot;time&quot;: now()&#10;}]" />
+		<ee:transform
+			doc:name="Set var object, condition, conditionValue"
+			doc:id="119e9f1a-88cd-4bb3-a9d3-2c65f2e484fb">
+			<ee:message />
+			<ee:variables>
+				<ee:set-variable variableName="object"><![CDATA[%dw 2.0
+output application/json
+---
+attributes.queryParams.'object']]></ee:set-variable>
+				<ee:set-variable variableName="conditionValue" ><![CDATA[%dw 2.0
+output application/json
+---
+attributes.queryParams.'conditionValue']]></ee:set-variable>
+				<ee:set-variable variableName="condition" ><![CDATA[%dw 2.0
+output application/json
+---
+attributes.queryParams.'condition']]></ee:set-variable>
+			
+</ee:variables>
+		</ee:transform>
+		<until-successful
+			maxRetries="${untillSuccessfull.attempts}"
+			doc:name="Until Successful"
+			doc:id="e921d486-51a5-411c-9f9e-fc121fe9594e"
+			millisBetweenRetries="${untillSuccessfull.frequency}">
+			<try doc:name="Try" doc:id="f0d35730-39a8-4549-95b1-745dcc3a6e8a">
+				<salesforce:query doc:name="Query Record" doc:id="7bf67120-c422-4e08-be7c-df1fbd25e239" config-ref="Salesforce_Config_OAuth_JWT">
+					<salesforce:salesforce-query><![CDATA[SELECT Id, :externalId from :obj where :condition = ':conditionValue']]></salesforce:salesforce-query>
+					<salesforce:parameters><![CDATA[#[output application/java
+---
+{
+	"conditionValue" : vars.conditionValue,
+	"condition" : vars.conditionName,
+	"obj" : vars.object
+}]]]></salesforce:parameters>
+				</salesforce:query>
+				<error-handler>
+					<on-error-propagate enableNotifications="false"
+						logException="false" doc:name="On Error Propagate"
+						doc:id="ae0a537e-b902-4c21-ade9-c3033904eafb"
+						type="SALESFORCE:CONNECTIVITY, SALESFORCE:RETRY_EXHAUSTED, SALESFORCE:TIMEOUT">
+						<logger level="ERROR" doc:name="Log Error"
+							doc:id="106668f1-0c30-4eb4-8774-3b88120ff4b4"
+							message='#[payload]' />
+						<set-variable value="#[error]" doc:name="Set errorObj" doc:id="b0287c27-a1e1-4cec-9c49-4619258baa22" variableName="errorObj" />
+					
+</on-error-propagate>
+					<on-error-continue enableNotifications="false" logException="false" doc:name="On Error Continue" doc:id="93b0429c-5ec3-4226-bdfa-9346096b0e2d" type="ANY">
+						<set-variable value="#[error]" doc:name="Set errorObj" doc:id="ca0a3d38-9292-4e48-981b-fa6a1f9f6ee1" variableName="errorObj"/>
+					</on-error-continue>
+				
+</error-handler>
+			</try>
+		</until-successful>
+		<choice doc:name="Check Salesforce Error" doc:id="b191d4f7-63b8-42eb-8d65-5ca9ccb7a8fe" >
+			<when expression="#[vars.errorObj ~= true]">
+				<raise-error doc:name="Raise APP:SALESFORCE_CUSTOM_ERROR" doc:id="5ce4fb63-2950-4ac7-81b6-7fa8f492ea5c" type="APP:SALESFORCE_CUSTOM_ERROR" description="APP:SALESFORCE_CUSTOM_ERROR"/>
+			</when>
+			<otherwise >
+				<ee:transform doc:name="Response" doc:id="9a004903-4b72-4b83-a42f-506a250920a2" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		</choice>
+		<logger level="INFO" doc:name="End Logger"
+			doc:id="e0f402f5-7ba9-4efc-b461-e8cad58227d9"
+			message='#[output json&#10;---&#10;{&#10;	"correlationId": vars.correlationId,&#10;	"message": "Get record Id flow Ended",&#10;	"object": vars.object,&#10;	"time": now()&#10;}]' />
+	</sub-flow>
+	<sub-flow name="get-all-records-sub-flow"
+		doc:id="e3bf0399-4094-4b62-900d-8ce0d41612e3">
+		<logger level="INFO" doc:name="Start Logger"
+			doc:id="1489d692-dc5f-41e3-9e74-cd84ea3fe2e5"
+			message="#[output json&#10;---&#10;{&#10;	&quot;level&quot;: &quot;Info&quot;,&#10;	&quot;message&quot;: &quot;Get all records flow started&quot;,&#10;	&quot;object&quot;: attributes.queryParams.'object',&#10;	&quot;limit&quot;: attributes.queryParams.'limit',&#10;	&quot;offset&quot;: attributes.queryParams.'offset',&#10;	&quot;time&quot;: now()&#10;}]" />
+		<ee:transform doc:name="Set var object, limit"
+			doc:id="ee09e20f-4d21-4082-8e68-3f8344cfc2d0">
+			<ee:message>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="limit"><![CDATA[%dw 2.0
+output application/json
+---
+attributes.queryParams.'limit' default 200]]></ee:set-variable>
+				<ee:set-variable variableName="object"><![CDATA[%dw 2.0
+output application/json
+---
+attributes.queryParams.'object']]></ee:set-variable>
+				<ee:set-variable variableName="offset" ><![CDATA[%dw 2.0
+output application/json
+---
+attributes.queryParams.'offset' default 0]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<until-successful maxRetries="${untillSuccessfull.attempts}" doc:name="Until Successful" doc:id="e9f383ce-ca06-4bfd-b1b7-7147680981b2" millisBetweenRetries="${untillSuccessfull.frequency}">
+			<try doc:name="Try" doc:id="610f589e-e82c-4665-b05d-3052a914438c">
+				<salesforce:query doc:name="Query Actual Records" doc:id="adcb8663-7a5e-4a39-bee0-92a81d066f4f" config-ref="Salesforce_Config_OAuth_JWT">
+						<salesforce:salesforce-query><![CDATA[select FIELDS(ALL) FROM :obj ORDER BY CreatedDate LIMIT :limit OFFSET :offset]]></salesforce:salesforce-query>
+						<salesforce:parameters><![CDATA[#[output application/java
+---
+{
+	"offset" :vars.offset,
+	"limit" : vars.limit,
+	"obj" : vars.object
+}]]]></salesforce:parameters>
+					</salesforce:query>
+				<error-handler>
+					<on-error-propagate enableNotifications="false" logException="false" doc:name="On Error Propagate" doc:id="45ca8f83-ac07-4369-b261-a9bf58fb5d16" type="SALESFORCE:CONNECTIVITY, SALESFORCE:RETRY_EXHAUSTED, SALESFORCE:TIMEOUT">
+						<logger level="ERROR" doc:name="Log Error" doc:id="eecf0e17-4fd1-4d1d-a9bb-05b6c63e65e5" message="#[payload]" />
+						<set-variable value="#[error]" doc:name="Set errorObj" doc:id="ad5f588a-74fe-42b2-980b-18c47757c644" variableName="errorObj" />
+					</on-error-propagate>
+					<on-error-continue enableNotifications="false" logException="false" doc:name="On Error Continue" doc:id="a0cc23d9-1e29-4870-8665-fc95fdca2f09" type="ANY">
+						<set-variable value="#[error]" doc:name="Set errorObj" doc:id="b8a92ad0-db8f-4736-9988-0db00cfb4a7c" variableName="errorObj" />
+					</on-error-continue>
+				</error-handler>
+			</try>
+		</until-successful>
+		<choice doc:name="Check Salesforce Error" doc:id="07c093bc-5e6a-4f4d-bb53-3fa69244698d" >
+			<when expression="#[vars.errorObj ~= true]" >
+				<raise-error doc:name="Raise APP:SALESFORCE_CUSTOM_ERROR" doc:id="4101a173-8124-4e72-bfb0-89200061ad92" type="APP:SALESFORCE_CUSTOM_ERROR" description="APP:SALESFORCE_CUSTOM_ERROR" />
+			</when>
+			<otherwise >
+				<ee:transform doc:name="Response" doc:id="e9b7f516-9ab2-42e5-b252-a2df4a016129" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		</choice>
+		<logger level="INFO" doc:name="End Logger" doc:id="4cbd4327-b772-43bf-8114-f9dbabdf8ee3" message='#[output json&#10;---&#10;{&#10;	"level": "Info",&#10;	"message": "Get all records flow Ended",&#10;	"object": vars.object,&#10;	"limit": vars.limit,&#10;	"offset": vars.offset,&#10;	"time": now()&#10;}]' />
+	
+</sub-flow>
+	<sub-flow name="create-records-sub-flow"
+		doc:id="546ca693-92dc-487e-95c5-1bfd6f053a48">
+		<logger level="INFO" doc:name="Start Logger"
+			doc:id="ab40bd88-b405-402f-9b9a-04f0277c2dfd"
+			message="#[output json&#10;---&#10;{&#10;	&quot;level&quot;: &quot;Info&quot;,&#10;	&quot;message&quot;: &quot;Create records flow started&quot;,&#10;	&quot;object&quot;: attributes.queryParams.'object',&#10;	&quot;time&quot;: now()&#10;}]" />
+		<ee:transform doc:name="Set var object"
+			doc:id="640f5e68-30f9-404b-a527-4780de864137">
+			<ee:message />
+			<ee:variables>
+				<ee:set-variable variableName="object"><![CDATA[%dw 2.0
+output application/json
+---
+attributes.queryParams.'object']]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<foreach doc:name="For Each" doc:id="77476f90-8537-4cdd-b998-ca89f53906c7" batchSize="200">
+			<until-successful maxRetries="${untillSuccessfull.attempts}" doc:name="Until Successful" doc:id="2c134830-6dd0-42e8-87e8-648986519072" millisBetweenRetries="${untillSuccessfull.frequency}">
+			<try doc:name="Try" doc:id="f1094d1d-acf2-466f-9e3b-22cbbedeb921">
+				<salesforce:create type="#[vars.object]" doc:name="Create Record" doc:id="941bab0a-ca94-4eeb-9ae5-6f7ca00ca562" config-ref="Salesforce_Config_OAuth_JWT" />
+				<error-handler>
+					<on-error-propagate enableNotifications="false" logException="false" doc:name="On Error Propagate" doc:id="24f1acd9-1719-48b9-ac94-fd9b8e8a6e63" type="SALESFORCE:CONNECTIVITY, SALESFORCE:RETRY_EXHAUSTED, SALESFORCE:TIMEOUT">
+						<logger level="ERROR" doc:name="Log Error" doc:id="559f7928-f631-4955-8d9f-6beff8c23921" message="#[payload]" />
+						<set-variable value="#[error]" doc:name="Set errorObj" doc:id="082fc5b4-1717-4697-b857-f703efa00493" variableName="errorObj" />
+					</on-error-propagate>
+					<on-error-continue enableNotifications="false" logException="false" doc:name="On Error Continue" doc:id="2baa88b0-9cec-43db-b222-bf36fb3481e5" type="ANY">
+						<set-variable value="#[error]" doc:name="Set errorObj" doc:id="ecaa866a-2a8e-47c4-9d8d-dbb47ae83732" variableName="errorObj" />
+					</on-error-continue>
+				</error-handler>
+			</try>
+		</until-successful>
+			<choice doc:name="Check Salesforce Error" doc:id="ac0b7d62-fbd8-4d01-ae6e-13bf53b45427">
+			<when expression="#[vars.errorObj ~= true]">
+				<raise-error doc:name="Raise APP:SALESFORCE_CUSTOM_ERROR" doc:id="13aa2e36-aa68-47e8-a45b-276685ed3ee6" type="APP:SALESFORCE_CUSTOM_ERROR" description="APP:SALESFORCE_CUSTOM_ERROR" />
+			</when>
+			<otherwise>
+				<ee:transform doc:name="Response" doc:id="600cf729-ddf9-47c2-862a-b50d6a27f56c">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		</choice>
+		</foreach>
+		<logger level="INFO" doc:name="End Logger" doc:id="9bacd3b4-ca79-415b-adb7-95a5c9c8ad6c" message='#[output json&#10;---&#10;{&#10;	"level": "Info",&#10;	"message": "Create records flow ended",&#10;	"object": vars.object,&#10;	"time": now()&#10;}]' />
+	
+</sub-flow>
+	<sub-flow name="update-records-sub-flow"
+		doc:id="75f0e224-a3d8-4cb8-a682-5eaedc1d8572">
+		<logger level="INFO" doc:name="Start Logger"
+			doc:id="4e4fdba3-edaf-4af9-954a-e645b5efb953"
+			message="#[output json&#10;---&#10;{&#10;	&quot;level&quot;: &quot;Info&quot;,&#10;	&quot;message&quot;: &quot;Update record flow started&quot;,&#10;	&quot;object&quot;: attributes.queryParams.'object',&#10;	&quot;time&quot;: now()&#10;}]" />
+		<ee:transform doc:name="Set var object, id"
+			doc:id="4327390c-e822-446b-8ffe-87db5d4149ed">
+			<ee:message />
+			<ee:variables>
+				<ee:set-variable variableName="object"><![CDATA[%dw 2.0
+output application/json
+---
+attributes.queryParams.'object']]></ee:set-variable>
+				<ee:set-variable variableName="id"><![CDATA[%dw 2.0
+output application/json
+---
+attributes.uriParams.'recordId']]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<until-successful maxRetries="${untillSuccessfull.attempts}" doc:name="Until Successful" doc:id="06339409-4b1d-451a-a046-f8571d2d1707" millisBetweenRetries="${untillSuccessfull.frequency}">
+			<try doc:name="Try" doc:id="403a696c-4ffc-4dbe-89ed-9d8b4510502f">
+				<salesforce:update doc:name="Update Record" doc:id="11d78c66-63bc-49f5-b4bf-bc4ad3d1937d" config-ref="Salesforce_Config_OAuth_JWT" type="#[vars.object]">
+					<salesforce:records><![CDATA[#[[payload ++ {"Id": vars.id}]]]]></salesforce:records>
+				</salesforce:update>
+				<error-handler>
+					<on-error-propagate enableNotifications="false" logException="false" doc:name="On Error Propagate" doc:id="4762e693-b060-4b97-b8be-cd45c16bd553" type="SALESFORCE:CONNECTIVITY, SALESFORCE:RETRY_EXHAUSTED, SALESFORCE:TIMEOUT">
+						<logger level="ERROR" doc:name="Log Error" doc:id="98d62342-08bf-4922-a584-2ce80fae27d0" message="#[payload]" />
+						<set-variable value="#[error]" doc:name="Set errorObj" doc:id="65b19866-12a2-4410-b014-4d4fdf4a0ed2" variableName="errorObj" />
+					</on-error-propagate>
+					<on-error-continue enableNotifications="false" logException="false" doc:name="On Error Continue" doc:id="915a190a-062c-4996-ac10-6e8a461c7b61" type="ANY">
+						<set-variable value="#[error]" doc:name="Set errorObj" doc:id="575e2d5c-1eb1-4ec8-b33c-52a723df42ef" variableName="errorObj" />
+					</on-error-continue>
+				</error-handler>
+			</try>
+		</until-successful>
+		<choice doc:name="Check Salesforce Error" doc:id="468c41e8-ade6-4f78-bc2e-4e4dc9e9ec9e" >
+			<when expression="#[vars.errorObj ~= true]" >
+				<raise-error doc:name="Raise APP:SALESFORCE_CUSTOM_ERROR" doc:id="1dd83dc7-a363-4f42-94ef-08796ae162a6" type="APP:SALESFORCE_CUSTOM_ERROR" description="APP:SALESFORCE_CUSTOM_ERROR" />
+			</when>
+			<otherwise >
+				<ee:transform doc:name="Response" doc:id="4d83402f-d0a2-4ce1-afd0-984315395003" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		</choice>
+		<logger level="INFO" doc:name="End Logger" doc:id="31faac9d-1f9a-4df7-8570-410cee6ed624" message='#[output json&#10;---&#10;{&#10;	"level": "Info",&#10;	"message": "Update record flow ended",&#10;	"object": vars.object,&#10;	"time": now()&#10;}]' />
+	
+</sub-flow>
+	<sub-flow name="delete-records-sub-flow"
+		doc:id="f1849010-128f-4468-90c6-9f1f6d91af58">
+		<logger level="INFO" doc:name="Start Logger"
+			doc:id="8f03476c-f851-4df7-8d24-e2ec061f7cf7"
+			message="#[output json&#10;---&#10;{&#10;	&quot;level&quot;: &quot;Info&quot;,&#10;	&quot;message&quot;: &quot;Delete record flow started&quot;,&#10;	&quot;object&quot;: attributes.queryParams.'object',&#10;	&quot;time&quot;: now()&#10;}]" />
+		<ee:transform doc:name="Set var object, id"
+			doc:id="48696d3f-11cd-4a15-895d-499a5e506dbc">
+			<ee:message />
+			<ee:variables>
+				<ee:set-variable variableName="object"><![CDATA[%dw 2.0
+output application/json
+---
+attributes.queryParams.'object']]></ee:set-variable>
+				<ee:set-variable variableName="id"><![CDATA[%dw 2.0
+output application/json
+---
+attributes.uriParams.'recordId']]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<until-successful maxRetries="${untillSuccessfull.attempts}" doc:name="Until Successful" doc:id="6dcd1782-9ff8-4707-80b5-3ec424a16094" millisBetweenRetries="${untillSuccessfull.frequency}">
+			<try doc:name="Try" doc:id="b420ab25-ab42-4aa3-a8cb-c3032ed45db4">
+				<salesforce:delete doc:name="Delete Record" doc:id="e58f7291-e20c-4ebe-8470-25f974897249" config-ref="Salesforce_Config_OAuth_JWT">
+					<salesforce:ids><![CDATA[#[[vars.id]]]]></salesforce:ids>
+				</salesforce:delete>
+				<error-handler>
+					<on-error-propagate enableNotifications="false" logException="false" doc:name="On Error Propagate" doc:id="4ee9a0de-b78a-45cc-9d7c-63a222d56729" type="SALESFORCE:CONNECTIVITY, SALESFORCE:RETRY_EXHAUSTED, SALESFORCE:TIMEOUT">
+						<logger level="ERROR" doc:name="Log Error" doc:id="a962ff48-4148-4afe-b69b-f9d775ebfc3d" message="#[payload]" />
+						<set-variable value="#[error]" doc:name="Set errorObj" doc:id="6c8ce50a-cbf3-4808-9307-1eb256134c97" variableName="errorObj" />
+					</on-error-propagate>
+					<on-error-continue enableNotifications="false" logException="false" doc:name="On Error Continue" doc:id="d0d68037-dea3-422f-8b3d-a17ff1b2720c" type="ANY">
+						<set-variable value="#[error]" doc:name="Set errorObj" doc:id="a43138b2-c139-4256-9704-52fe9016adc1" variableName="errorObj" />
+					</on-error-continue>
+				</error-handler>
+			</try>
+		</until-successful>
+		<choice doc:name="Check Salesforce Error" doc:id="5a900fc5-a429-4b5a-bc51-c7a4714a1400" >
+			<when expression="#[vars.errorObj ~= true]" >
+				<raise-error doc:name="Raise APP:SALESFORCE_CUSTOM_ERROR" doc:id="d2f39c15-d431-4e2b-a165-d5ea9da7faef" type="APP:SALESFORCE_CUSTOM_ERROR" description="APP:SALESFORCE_CUSTOM_ERROR" />
+			</when>
+			<otherwise >
+				<ee:transform doc:name="Response" doc:id="ee253858-5be6-44a2-b7a4-57a2afc067c9" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		</choice>
+		<logger level="INFO" doc:name="End Logger" doc:id="2b3e98d4-4867-47d7-bb1f-72773e90a8c5" message='#[output json&#10;---&#10;{&#10;	"level": "Info",&#10;	"message": "Delete record flow ended",&#10;	"object": vars.object,&#10;	"time": now()&#10;}]' />
+	
+</sub-flow>
+</mule>

@@ -1,0 +1,16 @@
+ 
+api:
+  id: "20742894"
+
+app:
+  host: "0.0.0.0"
+  port: "8081"
+
+untillSuccessfull:
+  frequency: "2000"
+  attempts: "2"
+  
+Salesforce: 
+ principle: "likhilchopde.714d097d0bda@agentforce.com"
+ tokenEndpoint: "https://login.salesforce.com/services/oauth2/token"
+ Url: "https://login.salesforce.com"
