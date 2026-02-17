@@ -44,9 +44,7 @@ jobs:
 
       - name: Deploy to CloudHub 2.0
         run: |
-          mvn -B deploy --settings .maven/settings.xml -DskipMunitTests -DmuleDeploy -Denv=dev -Dkey="${{secrets.KEY}}"\
-          -Danypoint.client.id="${{ secrets.ANYPOINT_CLIENT_ID }}" \
-          -Danypoint.client.secret="${{ secrets.ANYPOINT_CLIENT_SECRET }}"
+          mvn -B deploy --settings .maven/settings.xml -DskipMunitTests -DmuleDeploy -Denv=dev -Dkey="${{secrets.KEY}}"  -Danypoint.client.id="${{ secrets.ANYPOINT_CLIENT_ID }}" -Danypoint.client.secret="${{ secrets.ANYPOINT_CLIENT_SECRET }}"
           
 
   deploy-to-cloudhub-main:
@@ -67,6 +65,4 @@ jobs:
 
       - name: Deploy to CloudHub 2.0
         run: |
-          mvn -B deploy --settings .maven/settings.xml -DskipMunitTests -DmuleDeploy -Denv=dev -Dkey="${{secrets.KEY}}" \
-          -Danypoint.client.id="${{ secrets.ANYPOINT_CLIENT_ID }}" \
-          -Danypoint.client.secret="${{ secrets.ANYPOINT_CLIENT_SECRET }}" 
+          mvn -B deploy --settings .maven/settings.xml -DskipMunitTests -DmuleDeploy -Denv=dev -Dkey="${{secrets.KEY}}"  -Danypoint.client.id="${{ secrets.ANYPOINT_CLIENT_ID }}" -Danypoint.client.secret="${{ secrets.ANYPOINT_CLIENT_SECRET }}" 
