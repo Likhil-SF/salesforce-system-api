@@ -12,11 +12,13 @@
         </http:listener>
         <ee:transform doc:name="set correlationId" doc:id="191e7b26-d5f5-4394-a34c-4df01d8f73ce">
             <ee:message>
-                <ee:set-payload><![CDATA[%dw 2.0
+            </ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="correlationId" ><![CDATA[%dw 2.0
 output application/json
 ---
-attributes.headers.'X-Correlation-Id' default uuid()]]></ee:set-payload>
-            </ee:message>
+attributes.headers.'X-Correlation-Id' default uuid()]]></ee:set-variable>
+			</ee:variables>
         </ee:transform>
         <apikit:router config-ref="salesforce-system-api-config" />
         <error-handler ref="APIkit-error-handler" />
