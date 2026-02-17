@@ -6,7 +6,7 @@
 
 	<groupId>ab9b269f-eba0-4815-8ef3-e14af1ec32c1</groupId>
 	<artifactId>salesforce-system-app</artifactId>
-	<version>1.0.0</version>
+	<version>1.0.2</version>
 	<packaging>mule-application</packaging>
 
 	<name>salesforce-system-app</name>
