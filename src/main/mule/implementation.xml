@@ -65,7 +65,7 @@ attributes.queryParams.'condition']]></ee:set-variable>
 			</try>
 		</until-successful>
 		<choice doc:name="Check Salesforce Error" doc:id="b191d4f7-63b8-42eb-8d65-5ca9ccb7a8fe" >
-			<when expression="#[vars.errorObj ~= true]">
+			<when expression="#[!isEmpty(vars.errorObj)]">
 				<raise-error doc:name="Raise APP:SALESFORCE_CUSTOM_ERROR" doc:id="5ce4fb63-2950-4ac7-81b6-7fa8f492ea5c" type="APP:SALESFORCE_CUSTOM_ERROR" description="APP:SALESFORCE_CUSTOM_ERROR"/>
 			</when>
 			<otherwise >
@@ -130,7 +130,7 @@ attributes.queryParams.'offset' default 0]]></ee:set-variable>
 			</try>
 		</until-successful>
 		<choice doc:name="Check Salesforce Error" doc:id="07c093bc-5e6a-4f4d-bb53-3fa69244698d" >
-			<when expression="#[vars.errorObj ~= true]" >
+			<when expression="#[!isEmpty(vars.errorObj)]" >
 				<raise-error doc:name="Raise APP:SALESFORCE_CUSTOM_ERROR" doc:id="4101a173-8124-4e72-bfb0-89200061ad92" type="APP:SALESFORCE_CUSTOM_ERROR" description="APP:SALESFORCE_CUSTOM_ERROR" />
 			</when>
 			<otherwise >
@@ -177,7 +177,7 @@ attributes.queryParams.'object']]></ee:set-variable>
 			</try>
 		</until-successful>
 			<choice doc:name="Check Salesforce Error" doc:id="ac0b7d62-fbd8-4d01-ae6e-13bf53b45427">
-			<when expression="#[vars.errorObj ~= true]">
+			<when expression="#[!isEmpty(vars.errorObj)]">
 				<raise-error doc:name="Raise APP:SALESFORCE_CUSTOM_ERROR" doc:id="13aa2e36-aa68-47e8-a45b-276685ed3ee6" type="APP:SALESFORCE_CUSTOM_ERROR" description="APP:SALESFORCE_CUSTOM_ERROR" />
 			</when>
 			<otherwise>
@@ -230,7 +230,7 @@ attributes.uriParams.'recordId']]></ee:set-variable>
 			</try>
 		</until-successful>
 		<choice doc:name="Check Salesforce Error" doc:id="468c41e8-ade6-4f78-bc2e-4e4dc9e9ec9e" >
-			<when expression="#[vars.errorObj ~= true]" >
+			<when expression="#[!isEmpty(vars.errorObj)]" >
 				<raise-error doc:name="Raise APP:SALESFORCE_CUSTOM_ERROR" doc:id="1dd83dc7-a363-4f42-94ef-08796ae162a6" type="APP:SALESFORCE_CUSTOM_ERROR" description="APP:SALESFORCE_CUSTOM_ERROR" />
 			</when>
 			<otherwise >
@@ -282,7 +282,7 @@ attributes.uriParams.'recordId']]></ee:set-variable>
 			</try>
 		</until-successful>
 		<choice doc:name="Check Salesforce Error" doc:id="5a900fc5-a429-4b5a-bc51-c7a4714a1400" >
-			<when expression="#[vars.errorObj ~= true]" >
+			<when expression="#[!isEmpty(vars.errorObj)]" >
 				<raise-error doc:name="Raise APP:SALESFORCE_CUSTOM_ERROR" doc:id="d2f39c15-d431-4e2b-a165-d5ea9da7faef" type="APP:SALESFORCE_CUSTOM_ERROR" description="APP:SALESFORCE_CUSTOM_ERROR" />
 			</when>
 			<otherwise >
