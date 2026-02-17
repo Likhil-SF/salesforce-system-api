@@ -11,31 +11,30 @@
             </http:error-response>
         </http:listener>
         <ee:transform doc:name="set correlationId" doc:id="191e7b26-d5f5-4394-a34c-4df01d8f73ce">
-            <ee:message>
-            </ee:message>
-			<ee:variables >
-				<ee:set-variable variableName="correlationId" ><![CDATA[%dw 2.0
+            <ee:message />
+            <ee:variables>
+                <ee:set-variable variableName="correlationId"><![CDATA[%dw 2.0
 output application/json
 ---
 attributes.headers.'X-Correlation-Id' default uuid()]]></ee:set-variable>
-			</ee:variables>
+            </ee:variables>
         </ee:transform>
         <apikit:router config-ref="salesforce-system-api-config" />
         <error-handler ref="APIkit-error-handler" />
     </flow>
     <flow name="delete:\record\(recordId):salesforce-system-api-config">
-        <flow-ref doc:name="Flow Reference to delete-records-sub-flow" doc:id="f0fd4a8e-9775-4dc9-ba83-bd9272a79436" name="delete-records-sub-flow"/>
+        <flow-ref doc:name="Flow Reference to delete-records-sub-flow" doc:id="f0fd4a8e-9775-4dc9-ba83-bd9272a79436" name="delete-records-sub-flow" />
     </flow>
     <flow name="patch:\record\(recordId):application\json:salesforce-system-api-config">
-        <flow-ref doc:name="Flow Reference to update-records-sub-flow" doc:id="02e57773-d889-47a9-9a71-7139668d1aa2" name="update-records-sub-flow"/>
+        <flow-ref doc:name="Flow Reference to update-records-sub-flow" doc:id="02e57773-d889-47a9-9a71-7139668d1aa2" name="update-records-sub-flow" />
     </flow>
     <flow name="get:\record:salesforce-system-api-config">
-		<flow-ref doc:name="Flow Reference to get-record-id-sub-flow" doc:id="232510e7-d84a-4d77-9232-43f7bd137345" name="get-record-id-sub-flow"/>
+        <flow-ref doc:name="Flow Reference to get-record-id-sub-flow" doc:id="232510e7-d84a-4d77-9232-43f7bd137345" name="get-record-id-sub-flow" />
     </flow>
     <flow name="get:\records:salesforce-system-api-config">
-		<flow-ref doc:name="Flow Reference to get-all-records-sub-flow" doc:id="3a8e47f0-dcf4-46c6-95ea-edecc195295c" name="get-all-records-sub-flow"/>
+        <flow-ref doc:name="Flow Reference to get-all-records-sub-flow" doc:id="3a8e47f0-dcf4-46c6-95ea-edecc195295c" name="get-all-records-sub-flow" />
     </flow>
-	<flow name="post:\records:application\json:salesforce-system-api-config">
-		<flow-ref doc:name="Flow Reference to create-records-sub-flow" doc:id="7d4a2a2d-f500-46ec-9622-e4e9ea3d46e3" name="create-records-sub-flow"/>
+    <flow name="post:\records:application\json:salesforce-system-api-config">
+        <flow-ref doc:name="Flow Reference to create-records-sub-flow" doc:id="7d4a2a2d-f500-46ec-9622-e4e9ea3d46e3" name="create-records-sub-flow" />
     </flow>
 </mule>

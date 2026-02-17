@@ -162,11 +162,10 @@ output application/json
 attributes.queryParams.'object']]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
-		<foreach doc:name="For Each" doc:id="77476f90-8537-4cdd-b998-ca89f53906c7" batchSize="200">
-			<until-successful maxRetries="${untillSuccessfull.attempts}" doc:name="Until Successful" doc:id="2c134830-6dd0-42e8-87e8-648986519072" millisBetweenRetries="${untillSuccessfull.frequency}">
+		<until-successful maxRetries="${untillSuccessfull.attempts}" doc:name="Until Successful" doc:id="2c134830-6dd0-42e8-87e8-648986519072" millisBetweenRetries="${untillSuccessfull.frequency}">
 			<try doc:name="Try" doc:id="f1094d1d-acf2-466f-9e3b-22cbbedeb921">
 				<salesforce:create type="#[vars.object]" doc:name="Create Record" doc:id="941bab0a-ca94-4eeb-9ae5-6f7ca00ca562" config-ref="Salesforce_Config_OAuth_JWT" />
-				<error-handler>
+					<error-handler>
 					<on-error-propagate enableNotifications="false" logException="false" doc:name="On Error Propagate" doc:id="24f1acd9-1719-48b9-ac94-fd9b8e8a6e63" type="SALESFORCE:CONNECTIVITY, SALESFORCE:TIMEOUT">
 						<set-variable value="#[error]" doc:name="Set errorObj" doc:id="082fc5b4-1717-4697-b857-f703efa00493" variableName="errorObj" />
 					</on-error-propagate>
@@ -176,7 +175,7 @@ attributes.queryParams.'object']]></ee:set-variable>
 				</error-handler>
 			</try>
 		</until-successful>
-			<choice doc:name="Check Salesforce Error" doc:id="ac0b7d62-fbd8-4d01-ae6e-13bf53b45427">
+		<choice doc:name="Check Salesforce Error" doc:id="ac0b7d62-fbd8-4d01-ae6e-13bf53b45427">
 			<when expression="#[!isEmpty(vars.errorObj)]">
 				<raise-error doc:name="Raise APP:SALESFORCE_CUSTOM_ERROR" doc:id="13aa2e36-aa68-47e8-a45b-276685ed3ee6" type="APP:SALESFORCE_CUSTOM_ERROR" description="APP:SALESFORCE_CUSTOM_ERROR" />
 			</when>
@@ -191,7 +190,6 @@ payload]]></ee:set-payload>
 				</ee:transform>
 			</otherwise>
 		</choice>
-		</foreach>
 		<logger level="INFO" doc:name="End Logger" doc:id="9bacd3b4-ca79-415b-adb7-95a5c9c8ad6c" message='#[output json&#10;---&#10;{&#10;	"level": "Info",&#10;	"message": "Create records flow ended",&#10;	"object": vars.object,&#10;	"time": now()&#10;}]' />
 	
 </sub-flow>
