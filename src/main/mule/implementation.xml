@@ -40,12 +40,12 @@ attributes.queryParams.'condition']]></ee:set-variable>
 			millisBetweenRetries="${untillSuccessfull.frequency}">
 			<try doc:name="Try" doc:id="f0d35730-39a8-4549-95b1-745dcc3a6e8a">
 				<salesforce:query doc:name="Query Record" doc:id="7bf67120-c422-4e08-be7c-df1fbd25e239" config-ref="Salesforce_Config_OAuth_JWT">
-					<salesforce:salesforce-query><![CDATA[SELECT Id, :externalId from :obj where :condition = ':conditionValue']]></salesforce:salesforce-query>
+					<salesforce:salesforce-query><![CDATA[SELECT Id, :condition from :obj where :condition = ':conditionValue']]></salesforce:salesforce-query>
 					<salesforce:parameters><![CDATA[#[output application/java
 ---
 {
 	"conditionValue" : vars.conditionValue,
-	"condition" : vars.conditionName,
+	"condition" : vars.condition,
 	"obj" : vars.object
 }]]]></salesforce:parameters>
 				</salesforce:query>
@@ -53,10 +53,7 @@ attributes.queryParams.'condition']]></ee:set-variable>
 					<on-error-propagate enableNotifications="false"
 						logException="false" doc:name="On Error Propagate"
 						doc:id="ae0a537e-b902-4c21-ade9-c3033904eafb"
-						type="SALESFORCE:CONNECTIVITY, SALESFORCE:RETRY_EXHAUSTED, SALESFORCE:TIMEOUT">
-						<logger level="ERROR" doc:name="Log Error"
-							doc:id="106668f1-0c30-4eb4-8774-3b88120ff4b4"
-							message='#[payload]' />
+						type="SALESFORCE:CONNECTIVITY, SALESFORCE:TIMEOUT">
 						<set-variable value="#[error]" doc:name="Set errorObj" doc:id="b0287c27-a1e1-4cec-9c49-4619258baa22" variableName="errorObj" />
 					
 </on-error-propagate>
@@ -123,8 +120,7 @@ attributes.queryParams.'offset' default 0]]></ee:set-variable>
 }]]]></salesforce:parameters>
 					</salesforce:query>
 				<error-handler>
-					<on-error-propagate enableNotifications="false" logException="false" doc:name="On Error Propagate" doc:id="45ca8f83-ac07-4369-b261-a9bf58fb5d16" type="SALESFORCE:CONNECTIVITY, SALESFORCE:RETRY_EXHAUSTED, SALESFORCE:TIMEOUT">
-						<logger level="ERROR" doc:name="Log Error" doc:id="eecf0e17-4fd1-4d1d-a9bb-05b6c63e65e5" message="#[payload]" />
+					<on-error-propagate enableNotifications="false" logException="false" doc:name="On Error Propagate" doc:id="45ca8f83-ac07-4369-b261-a9bf58fb5d16" type="SALESFORCE:CONNECTIVITY, SALESFORCE:TIMEOUT">
 						<set-variable value="#[error]" doc:name="Set errorObj" doc:id="ad5f588a-74fe-42b2-980b-18c47757c644" variableName="errorObj" />
 					</on-error-propagate>
 					<on-error-continue enableNotifications="false" logException="false" doc:name="On Error Continue" doc:id="a0cc23d9-1e29-4870-8665-fc95fdca2f09" type="ANY">
@@ -171,8 +167,7 @@ attributes.queryParams.'object']]></ee:set-variable>
 			<try doc:name="Try" doc:id="f1094d1d-acf2-466f-9e3b-22cbbedeb921">
 				<salesforce:create type="#[vars.object]" doc:name="Create Record" doc:id="941bab0a-ca94-4eeb-9ae5-6f7ca00ca562" config-ref="Salesforce_Config_OAuth_JWT" />
 				<error-handler>
-					<on-error-propagate enableNotifications="false" logException="false" doc:name="On Error Propagate" doc:id="24f1acd9-1719-48b9-ac94-fd9b8e8a6e63" type="SALESFORCE:CONNECTIVITY, SALESFORCE:RETRY_EXHAUSTED, SALESFORCE:TIMEOUT">
-						<logger level="ERROR" doc:name="Log Error" doc:id="559f7928-f631-4955-8d9f-6beff8c23921" message="#[payload]" />
+					<on-error-propagate enableNotifications="false" logException="false" doc:name="On Error Propagate" doc:id="24f1acd9-1719-48b9-ac94-fd9b8e8a6e63" type="SALESFORCE:CONNECTIVITY, SALESFORCE:TIMEOUT">
 						<set-variable value="#[error]" doc:name="Set errorObj" doc:id="082fc5b4-1717-4697-b857-f703efa00493" variableName="errorObj" />
 					</on-error-propagate>
 					<on-error-continue enableNotifications="false" logException="false" doc:name="On Error Continue" doc:id="2baa88b0-9cec-43db-b222-bf36fb3481e5" type="ANY">
@@ -225,8 +220,7 @@ attributes.uriParams.'recordId']]></ee:set-variable>
 					<salesforce:records><![CDATA[#[[payload ++ {"Id": vars.id}]]]]></salesforce:records>
 				</salesforce:update>
 				<error-handler>
-					<on-error-propagate enableNotifications="false" logException="false" doc:name="On Error Propagate" doc:id="4762e693-b060-4b97-b8be-cd45c16bd553" type="SALESFORCE:CONNECTIVITY, SALESFORCE:RETRY_EXHAUSTED, SALESFORCE:TIMEOUT">
-						<logger level="ERROR" doc:name="Log Error" doc:id="98d62342-08bf-4922-a584-2ce80fae27d0" message="#[payload]" />
+					<on-error-propagate enableNotifications="false" logException="false" doc:name="On Error Propagate" doc:id="4762e693-b060-4b97-b8be-cd45c16bd553" type="SALESFORCE:CONNECTIVITY, SALESFORCE:TIMEOUT">
 						<set-variable value="#[error]" doc:name="Set errorObj" doc:id="65b19866-12a2-4410-b014-4d4fdf4a0ed2" variableName="errorObj" />
 					</on-error-propagate>
 					<on-error-continue enableNotifications="false" logException="false" doc:name="On Error Continue" doc:id="915a190a-062c-4996-ac10-6e8a461c7b61" type="ANY">
@@ -278,8 +272,7 @@ attributes.uriParams.'recordId']]></ee:set-variable>
 					<salesforce:ids><![CDATA[#[[vars.id]]]]></salesforce:ids>
 				</salesforce:delete>
 				<error-handler>
-					<on-error-propagate enableNotifications="false" logException="false" doc:name="On Error Propagate" doc:id="4ee9a0de-b78a-45cc-9d7c-63a222d56729" type="SALESFORCE:CONNECTIVITY, SALESFORCE:RETRY_EXHAUSTED, SALESFORCE:TIMEOUT">
-						<logger level="ERROR" doc:name="Log Error" doc:id="a962ff48-4148-4afe-b69b-f9d775ebfc3d" message="#[payload]" />
+					<on-error-propagate enableNotifications="false" logException="false" doc:name="On Error Propagate" doc:id="4ee9a0de-b78a-45cc-9d7c-63a222d56729" type="SALESFORCE:CONNECTIVITY, SALESFORCE:TIMEOUT">
 						<set-variable value="#[error]" doc:name="Set errorObj" doc:id="6c8ce50a-cbf3-4808-9307-1eb256134c97" variableName="errorObj" />
 					</on-error-propagate>
 					<on-error-continue enableNotifications="false" logException="false" doc:name="On Error Continue" doc:id="d0d68037-dea3-422f-8b3d-a17ff1b2720c" type="ANY">
